@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>guac | small lists, bigger days.</title>
+    <!-- Google Fonts for aesthetic handwritten & clean sans-serif typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-base: #F4F0E8;
+            --bg-card: #EBE6DB;
+            --bg-card-alt: #E3DDD0;
+            --accent-forest: #1F3A2B;
+            --accent-sage: #91A08B;
+            --accent-olive: #5B6D54;
+            --accent-lavender: #C6BAE2;
+            --text-dark: #2B332B;
+            --text-muted: #737A71;
+            --text-light: #F4F0E8;
+            --border-subtle: rgba(31, 58, 43, 0.08);
+            --radius-xl: 32px;
+            --radius-lg: 24px;
+            --radius-md: 18px;
+            --radius-pill: 999px;
+            --font-hand: 'Caveat', cursive;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            font-family: var(--font-sans);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        /* Mobile Frame Container */
+        .phone-frame {
+            width: 390px;
+            height: 820px;
+            background-color: var(--bg-base);
+            border-radius: 48px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4), 0 0 0 12px #2d2d2d;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Dynamic Island / Notch */
+        .dynamic-island {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 110px;
+            height: 28px;
+            background-color: #000000;
+            border-radius: 20px;
+            z-index: 1000;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 48px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 999;
+            color: var(--text-dark);
+        }
+
+        /* SVG Background Organic Shapes */
+        .bg-shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Screens Manager */
+        .screens-wrapper {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 22px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+            transform: translateY(10px);
+            overflow-y: auto;
+            scrollbar-width: none;
+        }
+
+        .screen::-webkit-scrollbar {
+            display: none;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        /* SCREEN 1: SPLASH */
+        #screen-splash {
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            padding-top: 140px;
+            padding-bottom: 60px;
+        }
+
+        .splash-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .splash-sparkles {
+            color: var(--accent-forest);
+            margin-bottom: 8px;
+        }
+
+        .splash-logo {
+            font-family: var(--font-hand);
+            font-size: 76px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 0.9;
+            letter-spacing: -1px;
+        }
+
+        .splash-tagline {
+            margin-top: 24px;
+            font-size: 15px;
+            color: var(--text-muted);
+            letter-spacing: 0.3px;
+            line-height: 1.6;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-forest);
+            color: var(--text-light);
+            border: none;
+            padding: 16px 36px;
+            border-radius: var(--radius-pill);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            box-shadow: 0 8px 20px rgba(31, 58, 43, 0.15);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+            background-color: #15271d;
+        }
+
+        /* SCREEN 2: MAIN TASKS */
+        .app-header {
+            margin-bottom: 20px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .greeting-title {
+            font-family: var(--font-hand);
+            font-size: 34px;
+            font-weight: 700;
+            color: var(--text-dark);
+            line-height: 1.1;
+        }
+
+        .header-icon {
+            color: var(--accent-forest);
+            padding: 4px;
+        }
+
+        /* Add Task Bar */
+        .add-task-box {
+            background-color: rgba(235, 230, 219, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-pill);
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        }
+
+        .add-task-input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            color: var(--text-dark);
+            width: 100%;
+        }
+
+        .add-task-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .add-btn-icon {
+            width: 24px;
+            height: 24px;
+            background-color: var(--accent-forest);
+            color: var(--text-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Filter Pills */
+        .pills-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 22px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .pill {
+            padding: 8px 18px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            font-weight: 500;
+            background-color: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .pill.active {
+            background-color: var(--accent-forest);
+            color: var(--text-light);
+        }
+
+        /* Task List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 80px;
+        }
+
+        .task-card {
+            background-color: rgba(235, 230, 219, 0.7);
+            border-radius: var(--radius-lg);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(5px);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .task-card:active {
+            transform: scale(0.98);
+        }
+
+        .task-card.lavender-tint {
+            background-color: rgba(198, 186, 226, 0.35);
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--accent-sage);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .task-card.completed .checkbox {
+            background-color: var(--accent-forest);
+            border-color: var(--accent-forest);
+            color: var(--text-light);
+        }
+
+        .task-card.completed .task-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .task-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .arrow-right {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* SCREEN 3: TASK DETAIL MODAL / SCREEN */
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            margin-top: 10px;
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .detail-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .tag-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .tag-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background-color: rgba(235, 230, 219, 0.8);
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .detail-card {
+            background-color: rgba(235, 230, 219, 0.6);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 16px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .detail-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+
+        .detail-notes-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            padding-left: 4px;
+        }
+
+        .detail-notes-list li {
+            position: relative;
+            padding-left: 14px;
+        }
+
+        .detail-notes-list li::before {
+            content: "-";
+            position: absolute;
+            left: 0;
+        }
+
+        .reminder-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(235, 230, 219, 0.6);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 30px;
+        }
+
+        .reminder-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* SCREEN 4: CALENDAR */
+        .calendar-header {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .calendar-month {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .days-strip {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .day-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .day-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .day-item.active .day-number {
+            background-color: var(--accent-forest);
+            color: var(--text-light);
+        }
+
+        .date-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 16px;
+            margin-bottom: 12px;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            background-color: rgba(244, 240, 232, 0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 100;
+            border-top: 1px solid rgba(31, 58, 43, 0.05);
+            padding-bottom: 10px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            background: none;
+            border: none;
+        }
+
+        .nav-item.active {
+            color: var(--accent-forest);
+        }
+
+        .nav-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Insights Screen Custom Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: rgba(235, 230, 219, 0.7);
+            border-radius: var(--radius-lg);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-forest);
+            font-family: var(--font-hand);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Phone Container -->
+    <div class="phone-frame">
+        
+        <!-- Top Hardware & Status Header -->
+        <div class="dynamic-island"></div>
+        <div class="status-bar">
+            <span>9:41</span>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <i data-lucide="signal" size="14"></i>
+                <i data-lucide="wifi" size="14"></i>
+                <i data-lucide="battery" size="16"></i>
+            </div>
+        </div>
+
+        <!-- Organic SVG Blobs (Exact Visual Aesthetic) -->
+        <svg class="bg-shapes" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 820">
+            <!-- Top Left Organic Sage/Green Blob -->
+            <path d="M-20,-20 Q70,40 100,120 Q120,180 30,220 Q-40,240 -60,180 Z" fill="#7E8F77" opacity="0.85"/>
+            
+            <!-- Bottom Right Lavender Soft Blob -->
+            <path d="M220,520 Q340,480 400,580 Q420,680 330,760 Q260,820 180,800 Q200,680 220,520 Z" fill="#C6BAE2" opacity="0.6"/>
+            
+            <!-- Bottom Deep Forest Green Blob -->
+            <path d="M-40,640 Q80,610 120,700 Q150,780 80,840 Q0,860 -60,800 Z" fill="#1F3A2B" opacity="0.9"/>
+            
+            <!-- Minimalist Line Accent -->
+            <path d="M180,740 Q250,720 320,780" stroke="#1F3A2B" stroke-width="1.5" fill="none" opacity="0.3"/>
+        </svg>
+
+        <!-- Dynamic Screen Manager -->
+        <div class="screens-wrapper">
+
+            <!-- SCREEN 0: SPLASH -->
+            <div class="screen active" id="screen-splash">
+                <div></div>
+                <div class="splash-brand">
+                    <i data-lucide="sparkles" class="splash-sparkles" size="24"></i>
+                    <h1 class="splash-logo">guac</h1>
+                    <p class="splash-tagline">small lists.<br>bigger days.</p>
+                </div>
+                <button class="btn-primary" onclick="switchTab('tasks')">
+                    get started <i data-lucide="arrow-right" size="16"></i>
+                </button>
+            </div>
+
+            <!-- SCREEN 1: TODAY / TASKS HOME -->
+            <div class="screen" id="screen-tasks">
+                <div class="app-header">
+                    <div>
+                        <h2 class="greeting-title">good morning,<br>you got this</h2>
+                    </div>
+                    <div class="header-icon">
+                        <i data-lucide="sparkle" size="20"></i>
+                    </div>
+                </div>
+
+                <!-- Add Task -->
+                <div class="add-task-box">
+                    <div class="add-btn-icon" onclick="addNewTask()">
+                        <i data-lucide="plus" size="14"></i>
+                    </div>
+                    <input type="text" class="add-task-input" id="taskInput" placeholder="add a new task..." onkeydown="handleKeyPress(event)">
+                </div>
+
+                <!-- Filter Pills -->
+                <div class="pills-row">
+                    <button class="pill active" onclick="filterTasks('all', this)">all</button>
+                    <button class="pill" onclick="filterTasks('today', this)">today</button>
+                    <button class="pill" onclick="filterTasks('upcoming', this)">upcoming</button>
+                    <button class="pill" onclick="filterTasks('done', this)">done</button>
+                </div>
+
+                <!-- Tasks List -->
+                <div class="task-list" id="taskList">
+                    <!-- Task Item 1 -->
+                    <div class="task-card" onclick="openDetail('Finish english essay', 'school')">
+                        <div class="task-left">
+                            <div class="checkbox" onclick="toggleTask(event, this)"></div>
+                            <div class="task-info">
+                                <span class="task-title">finish english essay</span>
+                                <div class="task-meta">
+                                    <i data-lucide="calendar" size="11"></i> today • school
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="arrow-right" size="16"></i>
+                    </div>
+
+                    <!-- Task Item 2 (Active/Selected Styling - Lavender) -->
+                    <div class="task-card lavender-tint completed" onclick="openDetail('Gym session', 'health')">
+                        <div class="task-left">
+                            <div class="checkbox" onclick="toggleTask(event, this)">
+                                <i data-lucide="check" size="12"></i>
+                            </div>
+                            <div class="task-info">
+                                <span class="task-title">gym session</span>
+                                <div class="task-meta">
+                                    <i data-lucide="calendar" size="11"></i> today • health
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="arrow-right" size="16"></i>
+                    </div>
+
+                    <!-- Task Item 3 -->
+                    <div class="task-card" onclick="openDetail('Grocery shopping', 'personal')">
+                        <div class="task-left">
+                            <div class="checkbox" onclick="toggleTask(event, this)"></div>
+                            <div class="task-info">
+                                <span class="task-title">grocery shopping</span>
+                                <div class="task-meta">
+                                    <i data-lucide="calendar" size="11"></i> today • personal
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="arrow-right" size="16"></i>
+                    </div>
+
+                    <!-- Task Item 4 -->
+                    <div class="task-card" onclick="openDetail('Call mom', 'personal')">
+                        <div class="task-left">
+                            <div class="checkbox" onclick="toggleTask(event, this)"></div>
+                            <div class="task-info">
+                                <span class="task-title">call mom</span>
+                                <div class="task-meta">
+                                    <i data-lucide="calendar" size="11"></i> upcoming • personal
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="arrow-right" size="16"></i>
+                    </div>
+
+                    <!-- Task Item 5 -->
+                    <div class="task-card" onclick="openDetail('Plan weekend trip', 'upcoming')">
+                        <div class="task-left">
+                            <div class="checkbox" onclick="toggleTask(event, this)"></div>
+                            <div class="task-info">
+                                <span class="task-title">plan weekend trip</span>
+                                <div class="task-meta">
+                                    <i data-lucide="calendar" size="11"></i> upcoming • personal
+                                </div>
+                            </div>
+                        </div>
+                        <i data-lucide="chevron-right" class="arrow-right" size="16"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN 2: TASK DETAIL -->
+            <div class="screen" id="screen-detail">
+                <div class="detail-header">
+                    <button class="icon-btn" onclick="switchTab('tasks')">
+                        <i data-lucide="arrow-left" size="20"></i>
+                    </button>
+                    <button class="icon-btn">
+                        <i data-lucide="more-horizontal" size="20"></i>
+                    </button>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                    <div class="checkbox" id="detailCheckbox" onclick="toggleDetailComplete()"></div>
+                    <h2 class="detail-title" id="detailTitle" style="margin-bottom:0;">finish english essay</h2>
+                </div>
+
+                <div class="tag-group" style="margin-top: 14px;">
+                    <span class="tag-pill"><i data-lucide="calendar" size="12"></i> today</span>
+                    <span class="tag-pill"><i data-lucide="tag" size="12"></i> <span id="detailTag">school</span></span>
+                </div>
+
+                <!-- Notes Card -->
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <i data-lucide="file-text" size="16"></i> notes
+                    </div>
+                    <ul class="detail-notes-list">
+                        <li>3 pages</li>
+                        <li>include examples</li>
+                        <li>review for corrections</li>
+                    </ul>
+                </div>
+
+                <!-- Reminder Card -->
+                <div class="reminder-card">
+                    <div class="reminder-left">
+                        <i data-lucide="bell" size="16"></i> reminder
+                    </div>
+                    <span style="font-size: 12px; color: var(--text-muted);">10:00 AM</span>
+                </div>
+
+                <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 20px;" onclick="switchTab('tasks')">
+                    <i data-lucide="check" size="16"></i> mark as done
+                </button>
+            </div>
+
+            <!-- SCREEN 3: CALENDAR VIEW -->
+            <div class="screen" id="screen-calendar">
+                <div class="calendar-header">
+                    <i data-lucide="chevron-left" size="18" style="cursor:pointer"></i>
+                    <span class="calendar-month">april 2025</span>
+                    <i data-lucide="chevron-right" size="18" style="cursor:pointer"></i>
+                </div>
+
+                <!-- Mini Week Strip -->
+                <div class="days-strip">
+                    <div class="day-item"><span>S</span><span class="day-number">21</span></div>
+                    <div class="day-item"><span>M</span><span class="day-number">22</span></div>
+                    <div class="day-item"><span>T</span><span class="day-number">23</span></div>
+                    <div class="day-item active"><span>W</span><span class="day-number">24</span></div>
+                    <div class="day-item"><span>T</span><span class="day-number">25</span></div>
+                    <div class="day-item"><span>F</span><span class="day-number">26</span></div>
+                    <div class="day-item"><span>S</span><span class="day-number">27</span></div>
+                </div>
+
+                <div class="date-section-title">today • thu, 24 apr</div>
+
+                <div class="task-list">
+                    <div class="task-card">
+                        <div class="task-left">
+                            <div class="checkbox"></div>
+                            <div class="task-info">
+                                <span class="task-title">finish english essay</span>
+                                <span class="task-meta">school • 10:00 AM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="task-card completed">
+                        <div class="task-left">
+                            <div class="checkbox"><i data-lucide="check" size="12"></i></div>
+                            <div class="task-info">
+                                <span class="task-title">gym session</span>
+                                <span class="task-meta">health • 5:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="date-section-title">tomorrow • fri, 25 apr</div>
+                <div class="task-list">
+                    <div class="task-card">
+                        <div class="task-left">
+                            <div class="checkbox"></div>
+                            <div class="task-info">
+                                <span class="task-title">call mom</span>
+                                <span class="task-meta">personal • 4:00 PM</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN 4: INSIGHTS VIEW -->
+            <div class="screen" id="screen-insights">
+                <div class="app-header">
+                    <h2 class="greeting-title">your insights</h2>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-value">12</span>
+                        <span class="stat-label">completed this week</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-value">85%</span>
+                        <span class="stat-label">completion rate</span>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-card-header">
+                        <i data-lucide="flame" size="16"></i> 5 day streak!
+                    </div>
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                        You've completed all your primary tasks for 5 consecutive days. Keep going!
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('tasks', this)">
+                <i data-lucide="home"></i>
+            </button>
+            <button class="nav-item" onclick="switchTab('calendar', this)">
+                <i data-lucide="calendar"></i>
+            </button>
+            <button class="nav-item" onclick="switchTab('insights', this)">
+                <i data-lucide="bar-chart-2"></i>
+            </button>
+            <button class="nav-item" onclick="switchTab('splash', this)">
+                <i data-lucide="user"></i>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Scripts for Icons and Interactions -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Navigation Switcher
+        function switchTab(screenId, navEl) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const targetScreen = document.getElementById('screen-' + screenId);
+            if (targetScreen) targetScreen.classList.add('active');
+
+            if (navEl) {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                navEl.classList.add('active');
+            }
+        }
+
+        // Toggle task completion check
+        function toggleTask(event, element) {
+            event.stopPropagation();
+            const card = element.closest('.task-card');
+            card.classList.toggle('completed');
+            
+            if (card.classList.contains('completed')) {
+                element.innerHTML = '<i data-lucide="check" size="12"></i>';
+            } else {
+                element.innerHTML = '';
+            }
+            lucide.createIcons();
+        }
+
+        // Open task detail page
+        function openDetail(title, category) {
+            document.getElementById('detailTitle').innerText = title.toLowerCase();
+            document.getElementById('detailTag').innerText = category;
+            switchTab('detail');
+        }
+
+        // Toggle completion in detail view
+        function toggleDetailComplete() {
+            const cb = document.getElementById('detailCheckbox');
+            cb.classList.toggle('checked');
+            if(cb.classList.contains('checked')) {
+                cb.style.backgroundColor = 'var(--accent-forest)';
+                cb.innerHTML = '<i data-lucide="check" size="12" style="color:white"></i>';
+            } else {
+                cb.style.backgroundColor = 'transparent';
+                cb.innerHTML = '';
+            }
+            lucide.createIcons();
+        }
+
+        // Add task functionality
+        function addNewTask() {
+            const input = document.getElementById('taskInput');
+            const val = input.value.trim();
+            if(!val) return;
+
+            const taskList = document.getElementById('taskList');
+            const newCard = document.createElement('div');
+            newCard.className = 'task-card';
+            newCard.onclick = () => openDetail(val, 'personal');
+            
+            newCard.innerHTML = `
+                <div class="task-left">
+                    <div class="checkbox" onclick="toggleTask(event, this)"></div>
+                    <div class="task-info">
+                        <span class="task-title">${val.toLowerCase()}</span>
+                        <div class="task-meta">
+                            <i data-lucide="calendar" size="11"></i> today • personal
+                        </div>
+                    </div>
+                </div>
+                <i data-lucide="chevron-right" class="arrow-right" size="16"></i>
+            `;
+
+            taskList.prepend(newCard);
+            input.value = '';
+            lucide.createIcons();
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                addNewTask();
+            }
+        }
+
+        // Filter pills handler
+        function filterTasks(type, btn) {
+            document.querySelectorAll('.pills-row .pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            
+            const cards = document.querySelectorAll('#taskList .task-card');
+            cards.forEach(card => {
+                if (type === 'all') {
+                    card.style.display = 'flex';
+                } else if (type === 'done') {
+                    card.style.display = card.classList.contains('completed') ? 'flex' : 'none';
+                } else {
+                    card.style.display = 'flex';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
